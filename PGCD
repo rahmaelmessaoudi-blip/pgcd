@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+
+// Fonction pour calculer le PGCD et les coefficients de Bézout
+int bezout(int a, int b, int *x, int *y, int *op_count) {
+    if (b == 0) {
+        *x = 1;
+        *y = 0;
+        return a;
+    }
+    int x1, y1;
+    int pgcd = bezout(b, a % b, &x1, &y1, op_count);
+    *x = y1;
+    *y = x1 - (a / b) * y1;
+    *op_count += 3; // division, multiplication, soustraction
+    return pgcd;
+}
+
+int main() {
+    int a, b, c;
+    int x, y;
+    int op_count = 0; // compteur d’opérations
+    clock_t start, end;
+    double cpu_time_used;
+
+    // Entrée des valeurs
+    printf ("Entrez a;");
+    scanf("%d",&a);
+    printf ("Entrez b;");
+    scanf("%d",&b);
+    printf("Entrez c;");
+    scanf("%d",&c);
+    start = clock(); // début du chronométrage
+
+    int pgcd = bezout(abs(a), abs(b), &x, &y, &op_count);
+
+    end = clock(); // fin du chronométrage
+    cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    printf("\nPGCD(%d, %d) = %d", a, b, pgcd);
+    printf("\nCoefficients de Bézout : x0 = %d , y0 = %d", x, y);
+
+    if (c % pgcd != 0) {
+        printf("\nPas de solution pour l'équation %d*x + %d*y = %d\n", a, b, c);
+    } else {
+        int k = c / pgcd;
+        printf("\nUne solution particulière : x = %d , y = %d", x * k, y * k);
+        printf("\nSolution générale :\n");
+        printf("x = %d + %d*t , y = %d - %d*t , t ∈ Z\n", x * k, b / pgcd, y * k, a / pgcd);
+    }
+
+    printf("\n\nNombre d'opérations effectuées : %d", op_count);
+    printf("\nTemps d'exécution : %.8f secondes", cpu_time_used);
+
+    // Comptage manuel des variables utilisées :
+    int nb_variables = 11; 
+    printf("\nNombre de variables utilisées : %d\n", nb_variables);
+
+    return 0;
+}
